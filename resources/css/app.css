@@ -1,0 +1,230 @@
+@import 'tailwindcss';
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@theme {
+    --font-sans: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+
+    --color-navy:        #0f1c2e;
+    --color-navy-mid:    #162032;
+    --color-navy-light:  #1e2d42;
+    --color-accent:      #3b82f6;
+    --color-accent2:     #06b6d4;
+    --color-success:     #10b981;
+    --color-warning:     #f59e0b;
+    --color-danger:      #ef4444;
+    --color-text:        #e2e8f0;
+    --color-text-dim:    #7f8ea3;
+
+    --spacing-sidebar: 240px;
+
+    --animate-fadeIn: fadeIn 0.25s ease;
+
+    @keyframes fadeIn {
+        0%   { opacity: 0; transform: translateY(8px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+}
+
+/* ============================================================
+   CSS VARIABLES — Dark Mode (default) & Light Mode
+   ============================================================ */
+:root,
+html.dark-mode {
+    --bg-primary:    #0f1c2e;
+    --bg-secondary:  #162032;
+    --text-primary:  #e2e8f0;
+    --text-secondary:#7f8ea3;
+    --border-color:  rgba(255,255,255,0.07);
+    --glass-bg:      rgba(255,255,255,0.04);
+    --glass-hover:   rgba(255,255,255,0.07);
+    --card-bg:       #162032;
+    --accent-glow:   rgba(59,130,246,0.15);
+}
+
+html.light-mode {
+    --bg-primary:    #f1f5f9;
+    --bg-secondary:  #ffffff;
+    --text-primary:  #0f172a;
+    --text-secondary:#64748b;
+    --border-color:  rgba(0,0,0,0.08);
+    --glass-bg:      rgba(0,0,0,0.03);
+    --glass-hover:   rgba(0,0,0,0.05);
+    --card-bg:       #ffffff;
+    --accent-glow:   rgba(59,130,246,0.10);
+}
+
+/* ============================================================
+   BASE
+   ============================================================ */
+@layer base {
+    body {
+        background-color: var(--bg-primary);
+        color: var(--text-primary);
+        min-height: 100vh;
+        overflow-x: hidden;
+        transition: background-color 0.3s, color 0.3s;
+    }
+
+    ::-webkit-scrollbar       { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.10); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.20); }
+}
+
+/* ============================================================
+   COMPONENTS
+   ============================================================ */
+@layer components {
+
+    /* --- Navigation --- */
+    .nav-item {
+        @apply flex items-center gap-[10px] px-3 py-[9px] mx-2 rounded-lg cursor-pointer
+               text-[13.5px] font-medium transition-all duration-200 no-underline;
+        color: var(--text-secondary);
+    }
+    .nav-item:hover {
+        background: var(--glass-hover);
+        color: var(--text-primary);
+    }
+    .nav-item.active {
+        background: var(--accent-glow);
+        color: #3b82f6;
+        border: 1px solid rgba(59,130,246,0.25);
+    }
+
+    /* --- Cards --- */
+    .stat-card {
+        @apply rounded-[14px] p-5 relative overflow-hidden
+               transition-all duration-200 cursor-default;
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+    }
+    .stat-card:hover {
+        transform: translateY(-2px);
+        border-color: rgba(255,255,255,0.12);
+    }
+
+    .section-card {
+        @apply rounded-[14px] overflow-hidden;
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+    }
+
+    .section-head {
+        @apply px-5 py-4 flex items-center justify-between;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .section-title  { @apply text-sm font-semibold; }
+    .section-sub    { @apply text-xs mt-[1px]; color: var(--text-secondary); }
+    .section-action {
+        @apply text-xs cursor-pointer px-2.5 py-1.5 rounded-md transition-all duration-200;
+        color: #3b82f6;
+        border: 1px solid rgba(59,130,246,0.30);
+        background: rgba(59,130,246,0.08);
+    }
+    .section-action:hover { background: rgba(59,130,246,0.15); }
+
+    /* --- Badges --- */
+    .badge        { @apply inline-flex items-center px-2 py-[3px] rounded-full text-[11px] font-semibold gap-1; }
+    .badge-green  { background: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.25); }
+    .badge-red    { background: rgba(239,68,68,0.15);  color: #ef4444; border: 1px solid rgba(239,68,68,0.25); }
+    .badge-yellow { background: rgba(245,158,11,0.15); color: #f59e0b; border: 1px solid rgba(245,158,11,0.25); }
+    .badge-blue   { background: rgba(59,130,246,0.15); color: #3b82f6; border: 1px solid rgba(59,130,246,0.25); }
+    .badge-gray   { background: rgba(127,142,163,0.15);color: #7f8ea3; border: 1px solid rgba(127,142,163,0.20); }
+
+    /* --- Table --- */
+    .data-table { @apply w-full border-collapse; }
+    .data-table th {
+        @apply px-4 py-2.5 text-[11px] font-semibold uppercase tracking-[0.6px] text-left;
+        color: var(--text-secondary);
+        border-bottom: 1px solid var(--border-color);
+    }
+    .data-table td {
+        @apply px-4 py-3 text-[13px];
+        border-bottom: 1px solid var(--border-color);
+    }
+    .data-table tbody tr:hover td { background: var(--glass-bg); }
+
+    /* --- Utility --- */
+    .mono { @apply font-mono text-[12px]; }
+
+    /* --- Buttons --- */
+    .btn-primary {
+        @apply px-[18px] py-[9px] rounded-lg text-[13px] font-semibold cursor-pointer
+               transition-all duration-200 text-white;
+        background: #3b82f6;
+    }
+    .btn-primary:hover { background: #2563eb; transform: translateY(-1px); }
+
+    .btn-secondary {
+        @apply px-[18px] py-[9px] rounded-lg text-[13px] font-medium cursor-pointer
+               transition-all duration-200;
+        background: var(--glass-bg);
+        color: var(--text-secondary);
+        border: 1px solid var(--border-color);
+    }
+    .btn-secondary:hover { background: var(--glass-hover); color: var(--text-primary); }
+
+    /* --- Form --- */
+    .form-input {
+        @apply px-3 py-[9px] rounded-lg text-[13px] outline-none transition-colors;
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        border: 1px solid var(--border-color);
+    }
+    .form-input:focus { border-color: rgba(59,130,246,0.50); }
+
+    /* --- Wireframe note --- */
+    .wireframe-note {
+        @apply rounded-[10px] px-4 py-3 text-xs mb-5 flex items-center gap-2;
+        background: rgba(59,130,246,0.08);
+        border: 1px dashed rgba(59,130,246,0.35);
+        color: #3b82f6;
+    }
+
+    /* --- Toast --- */
+    .toast-container {
+        @apply fixed bottom-20 right-4 z-[999] flex flex-col gap-2;
+    }
+    .toast {
+        @apply px-4 py-3 rounded-xl text-sm shadow-xl min-w-[260px] max-w-[320px];
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        color: var(--text-primary);
+        animation: fadeIn 0.25s ease;
+    }
+    .toast.success { border-color: rgba(16,185,129,0.4); }
+    .toast.error   { border-color: rgba(239,68,68,0.4); }
+    .toast.warning { border-color: rgba(245,158,11,0.4); }
+    .toast.fade-out { opacity: 0; transition: opacity 0.3s; }
+
+    /* --- Network status --- */
+    .network-status {
+        @apply fixed top-0 left-0 right-0 text-center text-xs py-1.5 z-[1000]
+               translate-y-[-100%] transition-transform duration-300;
+    }
+    .network-status.show  { transform: translateY(0); }
+    .network-status.online  { background: #10b981; color: white; }
+    .network-status.offline { background: #ef4444; color: white; }
+
+    /* --- Pull to refresh --- */
+    .ptr-element {
+        @apply fixed top-0 left-0 right-0 flex items-center justify-center gap-2
+               py-3 text-sm z-50 translate-y-[-100%] transition-transform duration-300;
+        background: var(--bg-secondary);
+        color: var(--text-secondary);
+        border-bottom: 1px solid var(--border-color);
+    }
+    .ptr-element.show { transform: translateY(0); }
+
+    /* --- Chart bars --- */
+    .bar { transition: opacity 0.2s; }
+    .bar:hover { opacity: 0.8; }
+}
