@@ -2,64 +2,56 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Barang;
 use App\Models\BarangMasuk;
+use App\Http\Requests\StoreBarangMasukRequest;
+use App\Services\StokService;
 use Illuminate\Http\Request;
 
 class BarangMasukController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function __construct(private StokService $stokService) {}
+
+    public function index(Request $request)
     {
-        //
+        $query = BarangMasuk::with(['barang', 'user'])
+            ->orderBy('tanggal', 'desc')
+            ->orderBy('created_at', 'desc');
+
+        if ($request->filled('dari')) {
+            $query->whereDate('tanggal', '>=', $request->dari);
+        }
+        if ($request->filled('sampai')) {
+            $query->whereDate('tanggal', '<=', $request->sampai);
+        }
+
+        $riwayat = $query->paginate(10)->withQueryString();
+
+        return view('masuk.index', compact('riwayat'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        $barang = Barang::orderBy('nama')->get();
+        return view('masuk.create', compact('barang'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function store(StoreBarangMasukRequest $request)
     {
-        //
-    }
+        $validated = $request->validated();
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(BarangMasuk $barangMasuk)
-    {
-        //
-    }
+        $masuk = BarangMasuk::create([
+            'barang_id'  => $validated['barang_id'],
+            'user_id'    => auth()->id() ?? 1,
+            'jumlah'     => $validated['jumlah'],
+            'tanggal'    => $validated['tanggal'],
+            'supplier'   => $validated['supplier'] ?? null,
+            'keterangan' => $validated['keterangan'] ?? null,
+        ]);
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(BarangMasuk $barangMasuk)
-    {
-        //
-    }
+        $this->stokService->tambahStok($validated['barang_id'], $validated['jumlah']);
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, BarangMasuk $barangMasuk)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(BarangMasuk $barangMasuk)
-    {
-        //
+        return redirect()->route('transaksi.masuk')
+            ->with('success', "Berhasil mencatat {$masuk->jumlah} barang masuk.");
     }
 }
