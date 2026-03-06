@@ -8,10 +8,10 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('barang_masuk', function (Blueprint $table) {
+        Schema::create('barang_keluar', function (Blueprint $table) {
             $table->id();
             $table->foreignId('barang_id')
-                  ->constrained('barang')
+                  ->constrained('barangs')
                   ->onDelete('restrict');
             $table->foreignId('user_id')
                   ->constrained('users')
