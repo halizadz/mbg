@@ -7,23 +7,23 @@
 
 @if(session('success'))
 <div class="mb-4 px-4 py-3 rounded-lg text-sm font-medium" style="background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.3);color:#10b981;">
-    ✅ {{ session('success') }}
+    <i class="fas fa-check-circle mr-1"></i> {{ session('success') }}
 </div>
 @endif
 @if(session('error'))
 <div class="mb-4 px-4 py-3 rounded-lg text-sm font-medium" style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#ef4444;">
-    ❌ {{ session('error') }}
+    <i class="fas fa-times-circle mr-1"></i> {{ session('error') }}
 </div>
 @endif
 
 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
     <div>
-        <h2 class="text-[22px] font-bold tracking-[-0.3px]">📤 Riwayat Barang Keluar</h2>
+        <h2 class="text-[22px] font-bold tracking-[-0.3px]"><i class="fas fa-arrow-up text-danger mr-2"></i> Riwayat Barang Keluar</h2>
         <p class="text-[13px] mt-1" style="color:var(--text-secondary);">Semua transaksi pengeluaran barang</p>
     </div>
     <a href="{{ route('transaksi.keluar.create') }}" class="btn-primary inline-flex items-center gap-2"
        style="background:#ef4444;">
-        ➕ Tambah Transaksi
+        <i class="fas fa-plus mr-1"></i> Tambah Transaksi
     </a>
 </div>
 
@@ -39,9 +39,9 @@
             <label class="block text-xs mb-1.5 font-medium" style="color:var(--text-secondary);">Sampai</label>
             <input type="date" name="sampai" value="{{ request('sampai') }}" class="form-input w-full sm:w-auto">
         </div>
-        <button type="submit" class="btn-secondary px-4 py-2 text-sm w-full sm:w-auto">🔍 Filter</button>
+        <button type="submit" class="btn-secondary px-4 py-2 text-sm w-full sm:w-auto"><i class="fas fa-search mr-1"></i> Filter</button>
         @if(request('dari') || request('sampai'))
-        <a href="{{ route('transaksi.keluar') }}" class="btn-secondary px-4 py-2 text-sm w-full sm:w-auto text-center">✕ Reset</a>
+        <a href="{{ route('transaksi.keluar') }}" class="btn-secondary px-4 py-2 text-sm w-full sm:w-auto text-center"><i class="fas fa-times mr-1"></i> Reset</a>
         @endif
     </form>
 </div>
@@ -63,26 +63,35 @@
                 </tr>
             </thead>
             <tbody>
-                @forelse($riwayat as $item)
+                @if($riwayat->isNotEmpty())
+                @foreach($riwayat as $item)
                 <tr>
                     <td class="mono">{{ $riwayat->firstItem() + $loop->index }}</td>
                     <td>{{ $item->tanggal->format('d M Y') }}</td>
-                    <td class="mono">{{ $item->barang->kode ?? '-' }}</td>
-                    <td>{{ $item->barang->nama ?? '-' }}</td>
+                    <td class="mono">{{ $item->barang->kode_barang ?? '-' }}</td>
+                    <td>{{ $item->barang->nama_barang ?? '-' }}</td>
                     <td class="mono font-bold" style="color:#ef4444;">-{{ $item->jumlah }}</td>
-                    <td class="mono {{ ($item->barang->stok ?? 0) <= ($item->barang->min_stok ?? 0) ? 'text-danger' : '' }}">
+                    <td class="mono {{ ($item->barang->stok ?? 0) <= ($item->barang->stok_minimum ?? 0) ? 'text-danger' : '' }}">
                         {{ $item->barang->stok ?? '-' }}
                     </td>
                     <td class="text-xs" style="color:var(--text-secondary);">{{ $item->keterangan ?? '-' }}</td>
                     <td>{{ $item->user->name ?? 'Admin' }}</td>
                 </tr>
-                @empty
+                @endforeach
+                @else
                 <tr>
-                    <td colspan="8" class="text-center py-8" style="color:var(--text-secondary);">
-                        Belum ada transaksi keluar.
+                    <td colspan="8" class="text-center py-16">
+                        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-50 mb-4">
+                            <i class="fas fa-box-open text-2xl text-red-500"></i>
+                        </div>
+                        <h3 class="text-base font-semibold text-gray-800 mb-1">Belum ada barang keluar</h3>
+                        <p class="text-sm text-gray-500 mb-5 max-w-sm mx-auto">Catat riwayat pengeluaran barang untuk mengurangi stok inventaris secara otomatis.</p>
+                        <a href="{{ route('transaksi.keluar.create') }}" class="btn-primary flex-inline items-center justify-center gap-2 mx-auto max-w-xs" style="background:#ef4444;">
+                            <i class="fas fa-plus"></i> Catat Barang Keluar
+                        </a>
                     </td>
                 </tr>
-                @endforelse
+                @endif
             </tbody>
         </table>
     </div>
@@ -90,7 +99,7 @@
     @if($riwayat->hasPages())
     <div class="flex flex-col sm:flex-row items-center justify-between gap-3 px-5 py-3 text-xs"
          style="border-top:1px solid var(--border-color);color:var(--text-secondary);">
-        <span>Menampilkan {{ $riwayat->firstItem() }}–{{ $riwayat->lastItem() }} dari {{ $riwayat->total() }} transaksi</span>
+        <span>Menampilkan {{ $riwayat->firstItem() }}&ndash;{{ $riwayat->lastItem() }} dari {{ $riwayat->total() }} transaksi</span>
         {{ $riwayat->links() }}
     </div>
     @endif

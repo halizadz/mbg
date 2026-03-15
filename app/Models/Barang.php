@@ -4,24 +4,27 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Barang extends Model
 {
-    protected $table = 'barang';
+    use SoftDeletes;
+
+    protected $table = 'barangs';
 
     protected $fillable = [
-        'kode',
-        'nama',
+        'kode_barang',
+        'nama_barang',
         'kategori',
         'satuan',
         'stok',
-        'min_stok',
+        'stok_minimum',
         'keterangan',
     ];
 
     protected $casts = [
-        'stok'     => 'integer',
-        'min_stok' => 'integer',
+        'stok'         => 'integer',
+        'stok_minimum' => 'integer',
     ];
 
     // ==================== RELASI ====================
@@ -38,10 +41,10 @@ class Barang extends Model
 
     // ==================== HELPER ====================
 
-    // Cek apakah stok menipis (di bawah atau sama dengan min_stok)
+    // Cek apakah stok menipis (di bawah atau sama dengan stok_minimum)
     public function stokMenipis(): bool
     {
-        return $this->stok <= $this->min_stok;
+        return $this->stok <= $this->stok_minimum;
     }
 
     // Status stok dalam bentuk teks
@@ -49,7 +52,7 @@ class Barang extends Model
     {
         if ($this->stok == 0) {
             return 'Habis';
-        } elseif ($this->stok <= $this->min_stok) {
+        } elseif ($this->stok <= $this->stok_minimum) {
             return 'Menipis';
         } else {
             return 'Aman';

@@ -8,27 +8,32 @@
     function toggleTheme() {
         const html = document.documentElement;
         const themeToggle = document.getElementById('themeToggle');
+        const icon = themeToggle.querySelector('i');
         
         if (html.classList.contains('dark-mode')) {
             html.classList.remove('dark-mode');
             html.classList.add('light-mode');
-            themeToggle.textContent = '🌞';
+            icon.className = 'fas fa-sun text-yellow-500';
             localStorage.setItem('theme', 'light');
             showToast('Mode terang diaktifkan', 'info');
         } else {
             html.classList.remove('light-mode');
             html.classList.add('dark-mode');
-            themeToggle.textContent = '🌙';
+            icon.className = 'fas fa-moon';
             localStorage.setItem('theme', 'dark');
             showToast('Mode gelap diaktifkan', 'info');
         }
     }
 
-    // Initialize theme
-    if (localStorage.getItem('theme') === 'light') {
-        document.documentElement.classList.remove('dark-mode');
-        document.documentElement.classList.add('light-mode');
-        document.getElementById('themeToggle').textContent = '🌞';
+    // Initialize theme toggle icon based on current class
+    const themeToggle = document.getElementById('themeToggle');
+    if (themeToggle) {
+        const icon = themeToggle.querySelector('i');
+        if (document.documentElement.classList.contains('dark-mode')) {
+            if (icon) icon.className = 'fas fa-moon';
+        } else {
+            if (icon) icon.className = 'fas fa-sun text-yellow-500';
+        }
     }
 
     document.getElementById('themeToggle').addEventListener('click', toggleTheme);
@@ -61,13 +66,13 @@
         const toast = document.createElement('div');
         toast.className = `toast ${type}`;
         
-        const icon = type === 'success' ? '✅' : (type === 'error' ? '❌' : (type === 'warning' ? '⚠️' : 'ℹ️'));
+        const icon = type === 'success' ? '<i class="fas fa-check-circle text-green-500"></i>' : (type === 'error' ? '<i class="fas fa-times-circle text-red-500"></i>' : (type === 'warning' ? '<i class="fas fa-exclamation-triangle text-yellow-500"></i>' : '<i class="fas fa-info-circle text-blue-500"></i>'));
         
         toast.innerHTML = `
             <div class="flex items-center gap-3">
                 <span>${icon}</span>
                 <span class="flex-1 text-sm">${message}</span>
-                <button onclick="this.parentElement.parentElement.remove()" class="text-[var(--text-secondary)] hover:text-[var(--text-primary)]">✕</button>
+                <button onclick="this.parentElement.parentElement.remove()" class="text-[var(--text-secondary)] hover:text-[var(--text-primary)]">&times;</button>
             </div>
         `;
         
@@ -151,20 +156,6 @@
         }
     });
 
-    // ==================== MOBILE SEARCH ====================
-    const mobileSearchDrawer = document.getElementById('mobileSearchDrawer');
-    
-    document.getElementById('mobileSearchBtn')?.addEventListener('click', () => {
-        mobileSearchDrawer?.classList.remove('-translate-y-full');
-        setTimeout(() => {
-            document.getElementById('mobileSearchInput')?.focus();
-        }, 300);
-    });
-
-    document.getElementById('closeMobileSearch')?.addEventListener('click', () => {
-        mobileSearchDrawer?.classList.add('-translate-y-full');
-    });
-
     // ==================== NOTIFICATION SYSTEM ====================
     document.getElementById('notificationBtn')?.addEventListener('click', () => {
         showToast('Tidak ada notifikasi baru', 'info');
@@ -186,5 +177,26 @@
         setTimeout(() => {
             window.location.href = '/login';
         }, 1500);
+    });
+
+    // ==================== GLOBAL FORM LOADING STATE ====================
+    document.addEventListener('submit', function(e) {
+        const form = e.target;
+        const submitBtn = form.querySelector('button[type="submit"]');
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Memproses...';
+            submitBtn.classList.add('opacity-75', 'cursor-not-allowed');
+            
+            // Re-enable if page doesn't navigate (e.g. client validation failed after submit)
+            setTimeout(() => {
+                if(!form.checkValidity()) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.classList.remove('opacity-75', 'cursor-not-allowed');
+                }
+            }, 100);
+        }
     });
 </script>

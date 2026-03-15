@@ -1,10 +1,10 @@
 <div class="grid grid-cols-2 gap-2 p-3 sm:p-4">
     @php
     $actions = [
-        ['route' => 'transaksi.masuk',  'icon' => '📥', 'label' => 'Barang Masuk'],
-        ['route' => 'transaksi.keluar', 'icon' => '📤', 'label' => 'Barang Keluar'],
-        ['route' => 'barang.tambah',    'icon' => '➕', 'label' => 'Tambah Barang'],
-        ['route' => 'laporan.index',    'icon' => '🖨️', 'label' => 'Cetak Laporan'],
+        ['route' => 'transaksi.masuk',  'icon' => '<i class="fas fa-arrow-down text-emerald-500"></i>', 'label' => 'Barang Masuk'],
+        ['route' => 'transaksi.keluar', 'icon' => '<i class="fas fa-arrow-up text-red-500"></i>', 'label' => 'Barang Keluar'],
+        ['route' => 'barang.tambah',    'icon' => '<i class="fas fa-plus text-blue-500"></i>', 'label' => 'Tambah Barang'],
+        ['route' => 'laporan.index',    'icon' => '<i class="fas fa-print text-indigo-400"></i>', 'label' => 'Cetak Laporan'],
     ];
     @endphp
 
@@ -14,7 +14,7 @@
        style="border:1px solid var(--border-color);background:var(--glass-bg);color:var(--text-primary);"
        onmouseover="this.style.background='var(--glass-hover)';this.style.borderColor='rgba(255,255,255,0.12)'"
        onmouseout="this.style.background='var(--glass-bg)';this.style.borderColor='var(--border-color)'">
-        <span class="text-xl sm:text-[22px]">{{ $action['icon'] }}</span>
+        <span class="text-xl sm:text-[22px]">{!! $action['icon'] !!}</span>
         <span class="text-[10px] sm:text-xs text-center">{{ $action['label'] }}</span>
     </a>
     @endforeach

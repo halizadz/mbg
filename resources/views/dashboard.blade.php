@@ -4,31 +4,35 @@
 @section('breadcrumb', 'Beranda / Dashboard')
 
 @section('content')
-<div class="wireframe-note mb-5">
-    🔵 <strong>Dashboard:</strong> Ringkasan stok, transaksi hari ini, grafik, dan alert stok menipis.
-</div>
 
 <!-- Stats Grid -->
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6">
     @include('components.stat-card', [
         'color' => 'blue', 'label' => 'Total Stok Tersedia',
-        'icon' => '📦', 'value' => '1,248', 'sub' => '47 jenis barang',
-        'trend' => 'up', 'trendText' => '↑ 3.2%'
+        'icon' => '<i class="fas fa-box"></i>', 'value' => number_format($totalStok),
+        'sub' => $totalJenisBarang . ' jenis barang',
+        'trend' => 'up', 'trendText' => ''
     ])
     @include('components.stat-card', [
         'color' => 'green', 'label' => 'Barang Masuk Hari Ini',
-        'icon' => '📥', 'value' => '38', 'sub' => '5 transaksi',
-        'trend' => 'up', 'trendText' => '↑ 12 vs kemarin'
+        'icon' => '<i class="fas fa-arrow-down"></i>', 'value' => number_format($masukHariIni),
+        'sub' => $txMasukHariIni . ' transaksi',
+        'trend' => $diffMasuk >= 0 ? 'up' : 'down',
+        'trendText' => ($diffMasuk >= 0 ? '<i class="fas fa-arrow-up mr-1"></i> ' : '<i class="fas fa-arrow-down mr-1"></i> ') . abs($diffMasuk) . ' vs kemarin'
     ])
     @include('components.stat-card', [
         'color' => 'orange', 'label' => 'Barang Keluar Hari Ini',
-        'icon' => '📤', 'value' => '22', 'sub' => '3 transaksi',
-        'trend' => 'down', 'trendText' => '↓ 5 vs kemarin'
+        'icon' => '<i class="fas fa-arrow-up"></i>', 'value' => number_format($keluarHariIni),
+        'sub' => $txKeluarHariIni . ' transaksi',
+        'trend' => $diffKeluar <= 0 ? 'down' : 'up',
+        'trendText' => ($diffKeluar >= 0 ? '<i class="fas fa-arrow-up mr-1"></i> ' : '<i class="fas fa-arrow-down mr-1"></i> ') . abs($diffKeluar) . ' vs kemarin'
     ])
     @include('components.stat-card', [
         'color' => 'red', 'label' => 'Stok Menipis',
-        'icon' => '⚠️', 'value' => '4', 'sub' => 'Perlu restock segera',
-        'trend' => 'down', 'trendText' => 'Kritis'
+        'icon' => '<i class="fas fa-exclamation-triangle"></i>', 'value' => $stokMenipis,
+        'sub' => $stokMenipis > 0 ? 'Perlu restock segera' : 'Semua stok aman',
+        'trend' => $stokMenipis > 0 ? 'down' : 'up',
+        'trendText' => $stokMenipis > 0 ? 'Kritis' : 'Aman'
     ])
 </div>
 
@@ -39,23 +43,20 @@
         <div class="section-card">
             <div class="section-head px-4 sm:px-5 py-3 sm:py-4">
                 <div>
-                    <div class="section-title">Grafik Transaksi — 7 Hari Terakhir</div>
+                    <div class="section-title">Grafik Transaksi &mdash; 7 Hari Terakhir</div>
                     <div class="section-sub">Perbandingan barang masuk vs keluar</div>
                 </div>
                 <a href="{{ route('laporan.index') }}" class="section-action text-[11px] sm:text-xs px-2 sm:px-2.5 py-1 sm:py-1.5">
-                    Lihat Laporan →
+                    Lihat Laporan &rarr;
                 </a>
             </div>
             <div class="p-3 sm:p-5">
                 <div class="overflow-x-auto pb-2">
                     @php
-                        $chartDays   = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Hari ini'];
-                        $chartMasuk  = [80, 110, 60, 140, 95, 50, 38];
-                        $chartKeluar = [45, 70, 90, 55, 120, 30, 22];
-                        $maxVal      = max(array_merge($chartMasuk, $chartKeluar)); // 140
-                        $chartH      = 140; // px tinggi area chart
+                        $maxVal = max(1, max(array_merge($chartMasuk, $chartKeluar)));
+                        $chartH = 140;
                     @endphp
-                    <div class="flex items-end gap-1 sm:gap-2 min-w-[560px] sm:min-w-0" style="height:<? $chartH + 20 ?>px;">
+                    <div class="flex items-end gap-1 sm:gap-2 min-w-[560px] sm:min-w-0" style="height:{{ $chartH + 20 }}px;">
                         @foreach($chartDays as $index => $day)
                         @php
                             $hMasuk  = (int) round($chartMasuk[$index]  / $maxVal * $chartH);
@@ -63,17 +64,17 @@
                             $isToday = $index === count($chartDays) - 1;
                         @endphp
                         <div class="flex-1 flex flex-col items-center gap-1">
-                            <div class="flex gap-[3px] items-end w-full" style="height:<? $chartH ?>px;">
+                            <div class="flex gap-[3px] items-end w-full" style="height:{{ $chartH }}px;">
                                 {{-- Bar Masuk --}}
                                 <div class="flex-1 rounded-t transition-opacity hover:opacity-75 cursor-pointer"
-                                     style="height:<? $hMasuk ?>px; background:linear-gradient(to bottom,#3b82f6,rgba(59,130,246,0.5));"
+                                     style="height:{{ max(2, $hMasuk) }}px; background:linear-gradient(to bottom,#3b82f6,rgba(59,130,246,0.5));"
                                      title="Masuk: {{ $chartMasuk[$index] }}"></div>
                                 {{-- Bar Keluar --}}
                                 <div class="flex-1 rounded-t transition-opacity hover:opacity-75 cursor-pointer"
-                                     style="height:<? $hKeluar ?>px; background:linear-gradient(to bottom,#ef4444,rgba(239,68,68,0.5));"
+                                     style="height:{{ max(2, $hKeluar) }}px; background:linear-gradient(to bottom,#ef4444,rgba(239,68,68,0.5));"
                                      title="Keluar: {{ $chartKeluar[$index] }}"></div>
                             </div>
-                            <span class="text-[10px]" style="color:<? $isToday ? '#3b82f6' : 'var(--text-secondary)' ?>; font-weight:{{ $isToday ? '600' : '400' }};">
+                            <span class="text-[10px]" style="color:{{ $isToday ? '#3b82f6' : 'var(--text-secondary)' }}; font-weight:{{ $isToday ? '600' : '400' }};">
                                 {{ $day }}
                             </span>
                         </div>
@@ -101,23 +102,27 @@
         <div class="section-card">
             <div class="section-head px-4 sm:px-5 py-3 sm:py-4">
                 <div>
-                    <div class="section-title">⚠️ Stok Menipis</div>
+                    <div class="section-title"><i class="fas fa-exclamation-triangle text-warning mr-2"></i> Stok Menipis</div>
                     <div class="section-sub">Di bawah batas minimum</div>
                 </div>
                 <a href="{{ route('stok.menipis') }}" class="section-action text-[11px] sm:text-xs">Lihat Semua</a>
             </div>
             <div class="divide-y" style="border-color:var(--border-color);">
-                @php
-                $alerts = [
-                    ['name' => 'Kertas HVS A4',       'code' => 'BRG-012', 'unit' => 'Lembar', 'stok' => 2, 'color' => 'danger'],
-                    ['name' => 'Tinta Printer Hitam',  'code' => 'BRG-031', 'unit' => 'Botol',  'stok' => 1, 'color' => 'danger'],
-                    ['name' => 'Spidol Whiteboard',    'code' => 'BRG-008', 'unit' => 'Pcs',    'stok' => 4, 'color' => 'warning'],
-                    ['name' => 'Amplop Coklat F4',     'code' => 'BRG-019', 'unit' => 'Pack',   'stok' => 3, 'color' => 'warning'],
-                ];
-                @endphp
-                @foreach($alerts as $alert)
-                    @include('components.alert-item', $alert)
+                @if($alertStok->isNotEmpty())
+                @foreach($alertStok as $item)
+                    @include('components.alert-item', [
+                        'name'  => $item->nama_barang,
+                        'code'  => $item->kode_barang,
+                        'unit'  => $item->satuan,
+                        'stok'  => $item->stok,
+                        'color' => $item->stok == 0 ? 'danger' : 'warning',
+                    ])
                 @endforeach
+                @else
+                    <div class="px-4 py-6 text-center text-xs" style="color:var(--text-secondary);">
+                        <i class="fas fa-check-circle text-emerald-500 mr-1"></i> Semua stok dalam kondisi aman.
+                    </div>
+                @endif
             </div>
         </div>
 
@@ -138,7 +143,7 @@
             <div class="section-title">Transaksi Terbaru</div>
             <div class="section-sub">10 transaksi terakhir hari ini</div>
         </div>
-        <a href="{{ route('laporan.index') }}" class="section-action text-[11px] sm:text-xs">Lihat Semua →</a>
+        <a href="{{ route('laporan.index') }}" class="section-action text-[11px] sm:text-xs">Lihat Semua &rarr;</a>
     </div>
 
     <div class="overflow-x-auto">
@@ -155,26 +160,31 @@
                 </tr>
             </thead>
             <tbody>
-                @php
-                $rows = [
-                    ['14:32','BRG-012','Kertas HVS A4',       'Keluar','red',   10,  2, 'Admin'],
-                    ['13:15','BRG-005','Ballpoint Pilot',      'Masuk', 'green', 50,120, 'Admin'],
-                    ['11:48','BRG-021','Binder Clip No.2',     'Masuk', 'green', 30, 85, 'Admin'],
-                    ['10:20','BRG-031','Tinta Printer Hitam',  'Keluar','red',    5,  1, 'Admin'],
-                    ['09:05','BRG-014','Map Plastik Bening',   'Masuk', 'green', 24, 67, 'Admin'],
-                ];
-                @endphp
-                @foreach($rows as [$waktu,$kode,$nama,$tipe,$tipeColor,$jml,$stok,$admin])
+                @if(count($transaksiTerbaru) > 0)
+                @foreach($transaksiTerbaru as $row)
                 <tr>
-                    <td>{{ $waktu }}</td>
-                    <td class="mono">{{ $kode }}</td>
-                    <td>{{ $nama }}</td>
-                    <td><span class="badge badge-{{ $tipeColor }}">{{ $tipe === 'Masuk' ? '📥' : '📤' }} {{ $tipe }}</span></td>
-                    <td class="mono">{{ $jml }}</td>
-                    <td class="mono {{ $stok <= 3 ? 'text-danger' : '' }}">{{ $stok }}</td>
-                    <td>{{ $admin }}</td>
+                    <td>{{ $row['waktu'] }}</td>
+                    <td class="mono">{{ $row['kode'] }}</td>
+                    <td>{{ $row['nama'] }}</td>
+                    <td>
+                        @if($row['tipe'] === 'Masuk')
+                            <span class="badge badge-green"><i class="fas fa-arrow-down mr-1"></i> Masuk</span>
+                        @else
+                            <span class="badge badge-red"><i class="fas fa-arrow-up mr-1"></i> Keluar</span>
+                        @endif
+                    </td>
+                    <td class="mono">{{ $row['jumlah'] }}</td>
+                    <td class="mono {{ $row['stok'] <= 3 ? 'text-danger' : '' }}">{{ $row['stok'] }}</td>
+                    <td>{{ $row['admin'] }}</td>
                 </tr>
                 @endforeach
+                @else
+                <tr>
+                    <td colspan="7" class="text-center py-8" style="color:var(--text-secondary);">
+                        Belum ada transaksi hari ini.
+                    </td>
+                </tr>
+                @endif
             </tbody>
         </table>
     </div>

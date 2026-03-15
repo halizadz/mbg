@@ -16,6 +16,7 @@ class BarangMasuk extends Model
         'tanggal',
         'supplier',
         'keterangan',
+        'foto_bukti',
     ];
 
     protected $casts = [

@@ -1,7 +1,7 @@
 @props([
     'color'     => 'blue',
     'label'     => '',
-    'icon'      => '📦',
+    'icon'      => '<i class="fas fa-box"></i>',
     'value'     => '0',
     'sub'       => '',
     'trend'     => null,
@@ -33,7 +33,7 @@ $iconBg   = $iconBgs[$color]   ?? $iconBgs['blue'];
         <div class="text-[11px] sm:text-xs font-medium" style="color:var(--text-secondary);">{{ $label }}</div>
         <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-sm sm:text-base shrink-0"
              style="background: <? $iconBg ?>;">
-            {{ $icon }}
+            {!! $icon !!}
         </div>
     </div>
 
@@ -48,7 +48,7 @@ $iconBg   = $iconBgs[$color]   ?? $iconBgs['blue'];
     @endphp
     <span class="inline-flex items-center gap-1 text-[10px] sm:text-[11px] font-semibold px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full mt-2"
           style="background:<? $trendBg ?>;color:{{ $trendColor }};">
-        {{ $trendText }}
+        {!! $trendText !!}
     </span>
     @endif
 </div>

@@ -1,12 +1,30 @@
 <!DOCTYPE html>
-<html lang="id" class="dark-mode">
+<html lang="id" class="light-mode">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <meta name="theme-color" content="#0f1c2e">
+    <meta name="theme-color" content="#f1f5f9">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>InvenTrack — @yield('title', 'Dashboard')</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @stack('styles')
+    <script>
+        // Persist theme immediately to prevent flashing
+        let theme = localStorage.getItem('theme');
+        if (!theme) {
+            theme = 'light';
+            localStorage.setItem('theme', theme);
+        }
+        
+        if (theme === 'dark') {
+            document.documentElement.classList.remove('light-mode');
+            document.documentElement.classList.add('dark-mode');
+        } else {
+            document.documentElement.classList.remove('dark-mode');
+            document.documentElement.classList.add('light-mode');
+        }
+    </script>
 </head>
 <body style="background:var(--bg-primary);color:var(--text-primary);" class="min-h-screen transition-colors duration-300">
 
@@ -15,7 +33,7 @@
 
     <!-- Pull to Refresh -->
     <div id="ptrElement" class="ptr-element">
-        <div class="animate-spin text-base">↻</div>
+        <div class="animate-spin text-base"><i class="fas fa-spinner"></i></div>
         <span id="ptrText">Tarik untuk refresh</span>
     </div>
 
@@ -26,14 +44,14 @@
     <button id="themeToggle"
         class="fixed bottom-4 right-4 lg:bottom-6 lg:right-6 z-50 w-10 h-10 sm:w-12 sm:h-12 rounded-full shadow-lg flex items-center justify-center text-lg sm:text-xl hover:scale-110 transition-transform"
         style="background:var(--bg-secondary);border:1px solid var(--border-color);">
-        🌙
+        <i class="fas fa-moon"></i>
     </button>
 
     <!-- Mobile Menu Button -->
     <button id="mobileMenuBtn"
         class="lg:hidden fixed top-4 left-4 z-50 w-10 h-10 rounded-lg flex items-center justify-center"
         style="background:var(--bg-secondary);border:1px solid var(--border-color);color:var(--text-primary);">
-        ☰
+        <i class="fas fa-bars"></i>
     </button>
 
     <!-- Overlay -->
@@ -48,7 +66,7 @@
         <div class="px-5 py-6 pb-5" style="border-bottom:1px solid var(--border-color);">
             <div class="flex items-center gap-2.5">
                 <div class="w-9 h-9 bg-gradient-to-r from-accent to-accent2 rounded-[10px] flex items-center justify-center text-lg text-white">
-                    📦
+                    <i class="fas fa-box-open"></i>
                 </div>
                 <div>
                     <div class="text-[17px] font-bold tracking-[-0.3px]">InvenTrack</div>
@@ -60,44 +78,61 @@
         <!-- Navigation -->
         <div class="px-3 pt-4 pb-2 text-[10px] font-semibold tracking-[1.2px] uppercase" style="color:var(--text-secondary);">Menu Utama</div>
         <a href="{{ route('dashboard') }}" class="nav-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
-            <span>🏠</span> Dashboard
+            <i class="fas fa-home w-5 text-center"></i> Dashboard
         </a>
         <a href="{{ route('barang.index') }}" class="nav-item {{ request()->routeIs('barang.*') ? 'active' : '' }}">
-            <span>📋</span> Data Barang
+            <i class="fas fa-list-alt w-5 text-center text-accent"></i> Data Barang
         </a>
         <a href="{{ route('transaksi.masuk') }}" class="nav-item {{ request()->routeIs('transaksi.masuk') ? 'active' : '' }}">
-            <span>📥</span> Barang Masuk
+            <i class="fas fa-arrow-down w-5 text-center text-success"></i> Barang Masuk
         </a>
         <a href="{{ route('transaksi.keluar') }}" class="nav-item {{ request()->routeIs('transaksi.keluar') ? 'active' : '' }}">
-            <span>📤</span> Barang Keluar
+            <i class="fas fa-arrow-up w-5 text-center text-danger"></i> Barang Keluar
         </a>
 
         <div class="px-3 pt-4 pb-2 text-[10px] font-semibold tracking-[1.2px] uppercase" style="color:var(--text-secondary);">Laporan</div>
         <a href="{{ route('laporan.index') }}" class="nav-item {{ request()->routeIs('laporan.index') ? 'active' : '' }}">
-            <span>📊</span> Laporan
+            <i class="fas fa-chart-bar w-5 text-center text-indigo-400"></i> Laporan
         </a>
         <a href="{{ route('stok.menipis') }}" class="nav-item {{ request()->routeIs('stok.menipis') ? 'active' : '' }}">
-            <span>⚠️</span> Stok Menipis
-            <span class="ml-auto text-[10px] font-bold px-1.5 py-0.5 rounded-full text-white" style="background:#ef4444;">4</span>
+            <i class="fas fa-exclamation-triangle w-5 text-center text-warning"></i> Stok Menipis
+            @php $stokMenipisCount = \App\Models\Barang::whereColumn('stok', '<=', 'stok_minimum')->count(); @endphp
+            @if($stokMenipisCount > 0)
+            <span class="ml-auto text-[10px] font-bold px-1.5 py-0.5 rounded-full text-white" style="background:#ef4444;">{{ $stokMenipisCount }}</span>
+            @endif
         </a>
 
+        @if(auth()->user()->isAdmin())
         <div class="px-3 pt-4 pb-2 text-[10px] font-semibold tracking-[1.2px] uppercase" style="color:var(--text-secondary);">Sistem</div>
-        <a href="{{ route('user.profile') }}" class="nav-item {{ request()->routeIs('user.profile') ? 'active' : '' }}">
-            <span>👤</span> Profil & User
+        <a href="{{ route('users.index') }}" class="nav-item {{ request()->routeIs('users.*') ? 'active' : '' }}">
+            <i class="fas fa-users w-5 text-center text-accent2"></i> Manajemen User
         </a>
+        <a href="{{ route('audit.index') }}" class="nav-item {{ request()->routeIs('audit.index') ? 'active' : '' }}">
+            <i class="fas fa-history w-5 text-center text-indigo-400"></i> Log Aktivitas (Audit)
+        </a>
+        <a href="{{ route('trash.index') }}" class="nav-item {{ request()->routeIs('trash.*') ? 'active' : '' }}">
+            <i class="fas fa-trash-restore w-5 text-center text-red-400"></i> Tempat Sampah
+        </a>
+        @endif
 
-        <!-- User Info -->
-        <div class="mt-auto p-4" style="border-top:1px solid var(--border-color);">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-gradient-to-r from-indigo-500 to-accent rounded-full flex items-center justify-center text-sm font-bold text-white shrink-0">
-                    A
+        <!-- User Info & Logout (Bottom Sidebar) -->
+        <div class="mt-auto p-4 flex items-center gap-3" style="border-top:1px solid var(--border-color);">
+            <a href="{{ route('user.profil') }}" class="flex-1 min-w-0 flex items-center gap-3 group" title="Profil Saya">
+                <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-accent rounded-full flex items-center justify-center text-lg shrink-0 group-hover:scale-105 transition-transform shadow-sm border border-blue-400/20 text-white">
+                    <i class="fas fa-user-tie"></i>
                 </div>
                 <div class="flex-1 min-w-0">
-                    <div class="text-sm font-semibold truncate">Admin Gudang</div>
-                    <div class="text-xs text-accent">Administrator</div>
+                    <div class="text-sm font-semibold truncate group-hover:text-accent transition-colors">{{ auth()->user()->name ?? 'User' }}</div>
+                    <div class="text-[10px] text-accent font-medium mt-0.5">PROFIL SAYA</div>
                 </div>
-                <button id="logoutBtn" class="transition-colors" style="color:var(--text-secondary);" title="Logout">⎋</button>
-            </div>
+            </a>
+            <form method="POST" action="{{ route('logout') }}" id="logout-form">
+                @csrf
+                <button type="submit" class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all hover:bg-red-500/10 text-red-500 border border-red-500/20 active:scale-95" title="Logout">
+                    <span>Keluar</span>
+                    <span class="text-sm"><i class="fas fa-undo"></i></span>
+                </button>
+            </form>
         </div>
     </aside>
 
@@ -112,25 +147,10 @@
                 <div class="text-[10px] sm:text-xs truncate" style="color:var(--text-secondary);">@yield('breadcrumb')</div>
             </div>
 
-            <!-- Search (desktop) -->
-            <div class="hidden sm:flex items-center gap-2 rounded-lg px-3 py-1.5 w-[180px] lg:w-[220px]"
-                style="background:var(--bg-secondary);border:1px solid var(--border-color);">
-                <span style="color:var(--text-secondary);">🔍</span>
-                <input type="text" placeholder="Cari barang..."
-                    class="bg-transparent border-none outline-none text-[13px] font-sans w-full"
-                    style="color:var(--text-primary);">
-            </div>
-
-            <!-- Mobile Search -->
-            <button id="mobileSearchBtn" class="sm:hidden w-8 h-8 rounded-lg flex items-center justify-center"
-                style="border:1px solid var(--border-color);background:var(--bg-secondary);color:var(--text-secondary);">
-                🔍
-            </button>
-
             <!-- Notifications -->
-            <button id="notificationBtn" class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center relative"
+            <button id="notificationBtn" class="sm:ml-auto w-8 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center relative"
                 style="border:1px solid var(--border-color);background:var(--bg-secondary);color:var(--text-secondary);">
-                🔔
+                <i class="fas fa-bell"></i>
                 <span id="notificationDot" class="absolute top-1.5 right-1.5 w-[7px] h-[7px] bg-danger rounded-full"
                     style="border:2px solid var(--bg-primary);"></span>
             </button>
@@ -138,25 +158,9 @@
             <!-- Refresh -->
             <button id="refreshBtn" class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center"
                 style="border:1px solid var(--border-color);background:var(--bg-secondary);color:var(--text-secondary);">
-                ↻
+                <i class="fas fa-sync-alt"></i>
             </button>
         </header>
-
-        <!-- Mobile Search Drawer -->
-        <div id="mobileSearchDrawer"
-            class="fixed inset-x-0 top-0 p-4 transform -translate-y-full transition-transform duration-300 z-50"
-            style="background:var(--bg-secondary);border-bottom:1px solid var(--border-color);">
-            <div class="flex items-center gap-3">
-                <div class="flex-1 flex items-center gap-2 rounded-lg px-3 py-2"
-                    style="background:var(--bg-primary);border:1px solid var(--border-color);">
-                    <span style="color:var(--text-secondary);">🔍</span>
-                    <input type="text" id="mobileSearchInput" placeholder="Cari barang..."
-                        class="bg-transparent border-none outline-none text-sm w-full"
-                        style="color:var(--text-primary);">
-                </div>
-                <button id="closeMobileSearch" style="color:var(--text-secondary);">✕</button>
-            </div>
-        </div>
 
         <!-- Content Area -->
         <div class="content p-3 sm:p-5 lg:p-7 flex-1">

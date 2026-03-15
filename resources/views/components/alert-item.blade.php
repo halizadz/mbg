@@ -22,7 +22,7 @@ $hex = $colorMap[$color] ?? '#ef4444';
     <div class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full shrink-0" style="background:<? $hex ?>;"></div>
     <div class="flex-1 min-w-0">
         <div class="text-xs sm:text-[13px] font-medium truncate">{{ $name }}</div>
-        <div class="text-[10px] sm:text-[11px] font-mono truncate" style="color:var(--text-secondary);">{{ $code }} · {{ $unit }}</div>
+        <div class="text-[10px] sm:text-[11px] font-mono truncate" style="color:var(--text-secondary);">{{ $code }} &middot; {{ $unit }}</div>
     </div>
     <div class="text-right shrink-0">
         <div class="text-base sm:text-lg font-bold font-mono" style="color:<? $hex ?>;">{{ $stok }}</div>
