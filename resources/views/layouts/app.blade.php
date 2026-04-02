@@ -59,7 +59,7 @@
 
     <!-- Sidebar -->
     <aside id="sidebar"
-        class="fixed top-0 left-0 w-[240px] h-screen flex flex-col z-50 transition-all duration-300 -translate-x-full lg:translate-x-0 overflow-y-auto"
+    class="fixed top-0 left-0 w-[240px] h-screen flex flex-col z-50 transition-all duration-300 -translate-x-full lg:translate-x-0 overflow-y-auto pb-[env(safe-area-inset-bottom)]"
         style="background:var(--bg-secondary);border-right:1px solid var(--border-color);">
 
         <!-- Logo -->
@@ -116,7 +116,7 @@
         @endif
 
         <!-- User Info & Logout (Bottom Sidebar) -->
-        <div class="mt-auto p-4 flex items-center gap-3" style="border-top:1px solid var(--border-color);">
+        <div class="lg:mt-auto mt-6 mb-8 lg:mb-0 p-4 flex items-center gap-3" style="border-top:1px solid var(--border-color);">
             <a href="{{ route('user.profil') }}" class="flex-1 min-w-0 flex items-center gap-3 group" title="Profil Saya">
                 <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-accent rounded-full flex items-center justify-center text-lg shrink-0 group-hover:scale-105 transition-transform shadow-sm border border-blue-400/20 text-white">
                     <i class="fas fa-user-tie"></i>
