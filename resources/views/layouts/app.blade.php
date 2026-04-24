@@ -65,9 +65,9 @@
         <!-- Logo -->
         <div class="px-5 py-6 pb-5" style="border-bottom:1px solid var(--border-color);">
             <div class="flex items-center gap-2.5">
-                <div class="w-9 h-9 bg-gradient-to-r from-accent to-accent2 rounded-[10px] flex items-center justify-center text-lg text-white">
-                    <i class="fas fa-box-open"></i>
-                </div>
+        <div class="w-9 h-9 bg-white rounded-[10px] flex items-center justify-center overflow-hidden border" style="border-color:var(--border-color);">
+            <img src="{{ asset('img/logo-bgn.png') }}" alt="Logo BGN" class="w-full h-full object-cover">
+        </div>
                 <div>
                     <div class="text-[17px] font-bold tracking-[-0.3px]">InvenTrack</div>
                     <div class="text-[11px] mt-0.5" style="color:var(--text-secondary);">Manajemen Inventaris</div>
@@ -118,7 +118,7 @@
         <!-- User Info & Logout (Bottom Sidebar) -->
         <div class="lg:mt-auto mt-6 mb-8 lg:mb-0 p-4 flex items-center gap-3" style="border-top:1px solid var(--border-color);">
             <a href="{{ route('user.profil') }}" class="flex-1 min-w-0 flex items-center gap-3 group" title="Profil Saya">
-                <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-accent rounded-full flex items-center justify-center text-lg shrink-0 group-hover:scale-105 transition-transform shadow-sm border border-blue-400/20 text-white">
+                <div class="w-10 h-10 bg-linear-to-r from-blue-500 to-accent rounded-full flex items-center justify-center text-lg shrink-0 group-hover:scale-105 transition-transform shadow-sm border border-blue-400/20 text-white">
                     <i class="fas fa-user-tie"></i>
                 </div>
                 <div class="flex-1 min-w-0">

@@ -17,13 +17,13 @@
   </style>
 </head>
 <body>
-  <div class="min-h-screen bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-900 flex items-center justify-center p-4">
+  <div class="min-h-screen bg-linear-to-br from-blue-600 via-blue-700 to-indigo-900 flex items-center justify-center p-4">
     <div class="w-full max-w-md animate-in">
       <!-- Logo & Title -->
       <div class="text-center mb-8">
-        <div class="inline-flex items-center justify-center w-20 h-20 bg-white/10 rounded-2xl mb-4 backdrop-blur-sm border border-white/20 shadow-lg">
-          <i class="fas fa-utensils text-3xl text-white"></i>
-        </div>
+      <div class="inline-flex items-center justify-center w-35 h-35 mb-4 p-2">
+        <img src="{{ asset('img/logo-bgn.png') }}" alt="Logo BGN" class="max-w-full max-h-full object-contain">
+      </div>
         <h1 class="text-3xl font-bold text-white tracking-tight">MBG</h1>
         <p class="text-blue-200 mt-1 text-sm">Sistem Inventaris Makan Bergizi Gratis</p>
       </div>
@@ -107,7 +107,7 @@
           <!-- Login Button -->
           <button 
             type="submit" 
-            class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-3 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl active:scale-[0.98] text-sm"
+            class="w-full bg-linear-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-3 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl active:scale-[0.98] text-sm"
           >
             <i class="fas fa-sign-in-alt mr-2"></i>
             Masuk
